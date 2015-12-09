@@ -55,6 +55,9 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 
 #ifdef USING_IOS
 @property (nonatomic, assign)   BOOL forceOutputToSpeaker;
+
+// Defaults to kAudioSessionCategory_PlayAndRecord
+@property (nonatomic) UInt32 audioSessionCategory;
 #endif
 
 // Explicitly declaring the block setters will create the correct block signature for auto-complete.

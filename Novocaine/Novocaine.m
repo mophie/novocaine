@@ -184,6 +184,10 @@ static Novocaine *audioManager = nil;
         _deviceNames = @[];
 #endif
         
+#if defined ( USING_IOS )
+        _audioSessionCategory = kAudioSessionCategory_PlayAndRecord;
+#endif
+        
         self.playing = NO;
         self.readyToPlay = NO;
         // self.playThroughEnabled = NO;
@@ -254,9 +258,28 @@ static Novocaine *audioManager = nil;
     _forceOutputToSpeaker = forceOutputToSpeaker;
 #endif
 }
+
+
+- (void)setAudioSessionCategory:(UInt32)audioSessionCategory
+{
+    _audioSessionCategory = audioSessionCategory;
+    
+    [self updateAudioSessionCategory];
+}
 #endif
 
 #pragma mark - Audio Methods
+
+#ifdef USING_IOS
+- (void)updateAudioSessionCategory
+{
+    UInt32 sessionCategory = self.audioSessionCategory;
+    
+    CheckError( AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
+                                         sizeof (sessionCategory),
+                                         &sessionCategory), "Couldn't set audio category");
+}
+#endif
 
 
 - (void)setupAudioSession
@@ -290,13 +313,7 @@ static Novocaine *audioManager = nil;
     // ---------------------------
     
 #if defined ( USING_IOS )
-    
-    // TODO: Move this somewhere more dynamic - should update category as appropriate to current application behavior
-    UInt32 sessionCategory = kAudioSessionCategory_PlayAndRecord;
-    CheckError( AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
-                                         sizeof (sessionCategory),
-                                         &sessionCategory), "Couldn't set audio category");    
-    
+    [self updateAudioSessionCategory];
     
     // Add a property listener, to listen to changes to the session
     CheckError( AudioSessionAddPropertyListener(kAudioSessionProperty_AudioRouteChange, sessionPropertyListener, (__bridge void*)self), "Couldn't add audio session property listener");
