@@ -116,6 +116,7 @@ static Novocaine *audioManager = nil;
 @property (nonatomic, assign, readwrite) AudioStreamBasicDescription inputFormat;
 @property (nonatomic, assign, readwrite) AudioStreamBasicDescription outputFormat;
 @property (nonatomic, assign, readwrite) BOOL playing;
+@property (nonatomic, assign, readwrite) BOOL readyToPlay;
 @property (nonatomic, assign, readwrite) float *inData;
 @property (nonatomic, assign, readwrite) float *outData;
 
@@ -188,13 +189,11 @@ static Novocaine *audioManager = nil;
 #endif
         
         self.playing = NO;
+        self.readyToPlay = NO;
         // self.playThroughEnabled = NO;
 		
 		// Fire up the audio session ( with steady error checking ... )
         [self setupAudioSession];
-        
-        // start audio units
-        [self setupAudioUnits];
 		
 		return self;
 		
@@ -286,6 +285,10 @@ static Novocaine *audioManager = nil;
 
 - (void)setupAudioUnits
 {
+    if (self.readyToPlay) {
+        NSLog(@"Audio Units are already set up");
+        return;
+    }
     
     // --- Audio Session Setup ---
     // ---------------------------
@@ -630,6 +633,7 @@ static Novocaine *audioManager = nil;
     CheckError(AudioUnitInitialize(_outputUnit), "Couldn't initialize the output unit");
 #endif
     
+    self.readyToPlay = YES;
 }
 
 #if defined (USING_OSX)

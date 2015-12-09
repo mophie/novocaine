@@ -80,6 +80,7 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 @property (nonatomic, assign, readonly) AudioStreamBasicDescription inputFormat;
 @property (nonatomic, assign, readonly) AudioStreamBasicDescription outputFormat;
 @property (nonatomic, assign, readonly) BOOL playing;
+@property (nonatomic, assign, readonly) BOOL readyToPlay;
 
 // @property BOOL playThroughEnabled;
 
@@ -88,6 +89,7 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 + (Novocaine *) audioManager;
 
 // Audio Unit methods
+- (void)setupAudioUnits;
 - (void)play;
 - (void)pause;
 
