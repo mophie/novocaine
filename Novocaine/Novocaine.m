@@ -121,11 +121,7 @@ static Novocaine *audioManager = nil;
 @property (nonatomic, assign, readwrite) float *outData;
 
 #if defined (USING_OSX)
-@property (nonatomic, assign) AudioDeviceID *deviceIDs;
-@property (nonatomic, strong) NSMutableArray *deviceNames;
-@property (nonatomic, assign) AudioDeviceID defaultInputDeviceID;
 @property (nonatomic, strong) NSString *defaultInputDeviceName;
-@property (nonatomic, assign) AudioDeviceID defaultOutputDeviceID;
 @property (nonatomic, strong) NSString *defaultOutputDeviceName;
 - (void)enumerateAudioDevices;
 #endif
@@ -185,7 +181,7 @@ static Novocaine *audioManager = nil;
         self.outputBlock = nil;
         
 #if defined ( USING_OSX )
-        self.deviceNames = [[NSMutableArray alloc] initWithCapacity:100]; // more than we'll need
+        _deviceNames = @[];
 #endif
         
         self.playing = NO;
@@ -652,11 +648,11 @@ static Novocaine *audioManager = nil;
     propertyAddress.mElement = kAudioObjectPropertyElementMaster;
     
     AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &propSize);
-    uint32_t deviceCount = ( propSize / sizeof(AudioDeviceID) );
+    _deviceCount = ( propSize / sizeof(AudioDeviceID) );
     
     // Allocate the device IDs
-    _deviceIDs = (AudioDeviceID *)calloc(deviceCount, sizeof(AudioDeviceID));
-    [_deviceNames removeAllObjects];
+    _deviceIDs = (AudioDeviceID *)calloc(self.deviceCount, sizeof(AudioDeviceID));
+    NSMutableArray *deviceNames = [[NSMutableArray alloc] initWithCapacity:self.deviceCount];
     
     // Get all the device IDs
     CheckError( AudioObjectGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &propSize, _deviceIDs ), "Could not get device IDs");
@@ -669,7 +665,7 @@ static Novocaine *audioManager = nil;
     UInt32 nameBufSize;
     AudioObjectPropertyAddress deviceAddress;
     
-    for( int i = 0; i < deviceCount; i++ )
+    for( int i = 0; i < self.deviceCount; i++ )
     {
         deviceAddress.mSelector = kAudioDevicePropertyDeviceName;
         deviceAddress.mScope = kAudioObjectPropertyScopeGlobal;
@@ -689,9 +685,10 @@ static Novocaine *audioManager = nil;
         
         NSString *thisDeviceName = [NSString stringWithFormat:@"%@: %@", [NSString stringWithUTF8String:mfrNameBuffer], [NSString stringWithUTF8String:deviceNameBuffer]];
         NSLog(@"Device: %@, ID: %d", thisDeviceName, self.deviceIDs[i]);
-        [self.deviceNames addObject:thisDeviceName];
+        [deviceNames addObject:thisDeviceName];
     }
     
+    _deviceNames = [deviceNames copy];
 }
 
 #endif

@@ -84,6 +84,15 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 
 // @property BOOL playThroughEnabled;
 
+#if defined ( USING_OSX )
+@property (nonatomic, assign, readonly) AudioDeviceID *deviceIDs;
+@property (nonatomic, assign, readonly) uint32_t deviceCount;
+@property (nonatomic, strong, readonly) NSArray *deviceNames;
+
+@property (nonatomic, assign) AudioDeviceID defaultOutputDeviceID;
+@property (nonatomic, assign) AudioDeviceID defaultInputDeviceID;
+#endif
+
 
 // Singleton methods
 + (Novocaine *) audioManager;
