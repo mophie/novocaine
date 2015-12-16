@@ -186,6 +186,7 @@ static Novocaine *audioManager = nil;
         
 #if defined ( USING_IOS )
         _audioSessionCategory = kAudioSessionCategory_PlayAndRecord;
+        _audioSessionMode = kAudioSessionMode_Default;
 #endif
         
         self.playing = NO;
@@ -266,6 +267,14 @@ static Novocaine *audioManager = nil;
     
     [self updateAudioSessionCategory];
 }
+
+
+- (void)setAudioSessionMode:(UInt32)audioSessionMode
+{
+    _audioSessionMode = audioSessionMode;
+    
+    [self updateAudioSessionMode];
+}
 #endif
 
 #pragma mark - Audio Methods
@@ -277,7 +286,16 @@ static Novocaine *audioManager = nil;
     
     CheckError( AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
                                          sizeof (sessionCategory),
-                                         &sessionCategory), "Couldn't set audio category");
+                                         &sessionCategory), "Couldn't update audio session category");
+}
+
+- (void)updateAudioSessionMode
+{
+    UInt32 sessionMode = self.audioSessionMode;
+    
+    CheckError( AudioSessionSetProperty (kAudioSessionProperty_Mode,
+                                         sizeof(sessionMode),
+                                         &sessionMode), "Couldn't update audio session mode");
 }
 #endif
 
@@ -314,6 +332,7 @@ static Novocaine *audioManager = nil;
     
 #if defined ( USING_IOS )
     [self updateAudioSessionCategory];
+    [self updateAudioSessionMode];
     
     // Add a property listener, to listen to changes to the session
     CheckError( AudioSessionAddPropertyListener(kAudioSessionProperty_AudioRouteChange, sessionPropertyListener, (__bridge void*)self), "Couldn't add audio session property listener");

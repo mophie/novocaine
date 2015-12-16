@@ -58,6 +58,9 @@ typedef void (^NovocaineInputBlock)(float *data, UInt32 numFrames, UInt32 numCha
 
 // Defaults to kAudioSessionCategory_PlayAndRecord
 @property (nonatomic) UInt32 audioSessionCategory;
+
+// Defaults to kAudioSessionMode_Default
+@property (nonatomic) UInt32 audioSessionMode;
 #endif
 
 // Explicitly declaring the block setters will create the correct block signature for auto-complete.
